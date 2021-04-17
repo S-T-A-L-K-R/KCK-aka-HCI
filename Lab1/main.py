@@ -1,3 +1,4 @@
+from functools import partial
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -24,6 +25,8 @@ class Calculator(QMainWindow):
 class UserArea(QWidget):
     def __init__(self):
         super(UserArea, self).__init__()
+        self.Equation = "\0"
+        self.Sign = "\0"
         self.KNumbersPattern = [['7','8','9'],
                                 ['4','5','6'],
                                 ['1','2','3'],
@@ -39,18 +42,23 @@ class UserArea(QWidget):
         self.initKNumbers() # Add numeric keyboard
         self.initKSigns() # Add special keyboard
         
-        self.Equation = "0"
+        
         self.initUI()
     def initDisplay(self):
         self.Display = QLineEdit()
         self.Display.setAlignment(Qt.AlignRight)
+         # self.Display.setFixedHeight(35)
+        # Display.setAlignment(Qt.AlignRight)
+        self.Display.setReadOnly(True)
+        self.EquationDisplay()
 
     def initKNumbers(self):
         self.KNumbers = QGridLayout() # Klawiatura
         for rownum, row in enumerate(self.KNumbersPattern):
             for columnnum, sign in enumerate(row):
                 self.KNumbersButtons[rownum][columnnum] = QPushButton(sign)
-                self.KNumbersButtons[rownum][columnnum].clicked.connect(self.sieben) # TODO Sieben na normalną funkcję
+                # self.KNumbersButtons[rownum][columnnum].clicked.connect(lambda: self.ClickNumbers(sign)) 
+                self.KNumbersButtons[rownum][columnnum].clicked.connect(partial(self.ClickNumbers, sign))
                 self.KNumbers.addWidget(self.KNumbersButtons[rownum][columnnum], rownum, columnnum)
 
     def initKSigns(self):
@@ -58,31 +66,16 @@ class UserArea(QWidget):
         for rownum, row in enumerate(self.KSignsPattern):
             for columnnum, sign in enumerate(row):
                 self.KSignsButtons[rownum][columnnum] = QPushButton(sign)
-                self.KSignsButtons[rownum][columnnum].clicked.connect(self.sieben) # TODO Sieben na inną funkcję
+                self.KSignsButtons[rownum][columnnum].clicked.connect(self.ClickSigns) # TODO ClickNumbers na inną funkcję
                 self.KSigns.addWidget(self.KSignsButtons[rownum][columnnum], rownum, columnnum)
 
     def initUI(self):
         vb = QVBoxLayout()
         self.setLayout(vb)
         vb.addWidget(QLCDNumber(0, self))
-        
-        
-        KSigns = QGridLayout() # Klawiatura - symbole
-        KSigns.addWidget(QPushButton(":")  , 0, 0)
-        KSigns.addWidget(QPushButton("x")  , 1, 0)
-        KSigns.addWidget(QPushButton("-")  , 2, 0)
-        KSigns.addWidget(QPushButton("+")  , 3, 0)
-        KSigns.addWidget(QPushButton("DEL"), 0, 1)
-        KSigns.addWidget(QPushButton("C")  , 1, 1)
-        KSigns.addWidget(QPushButton("^2") , 2, 1)
-        KSigns.addWidget(QPushButton("=")  , 3, 1)
 
         DisplayBox = QGridLayout()
         
-        
-        # self.Display.setFixedHeight(35)
-        # Display.setAlignment(Qt.AlignRight)
-        self.Display.setReadOnly(True)
         DisplayBox.addWidget(self.Display)
 
         hb = QHBoxLayout()
@@ -91,15 +84,33 @@ class UserArea(QWidget):
         hb.addStretch(1)
         hb.addLayout(self.KNumbers)
         hb.addStretch(2)
-        hb.addLayout(KSigns)
+        hb.addLayout(self.KSigns)
         vb.addStretch(1)
         vb.addLayout(hb)
         
     def click(self):
         print(self.sender().text())
-    def sieben(self):
-        print("xd")
-        self.Display.setText("xd")
+    def ClickNumbers(self, sign):
+        print(sign)
+        if sign not in {'+/-', ','}:
+            self.Equation = self.Equation + sign
+        elif sign == ',':
+            if ',' not in self.Equation:
+                self.Equation = self.Equation + sign
+        else:
+            if '-' not in self.Equation:
+                self.Equation = '-' + self.Equation
+            else:
+                self.Equation = self.Equation[1:]
+        self.EquationDisplay()
+
+    def ClickSigns(self, sign):
+        return 0
+    def EquationDisplay(self):
+        if self.Equation == "\0":
+            self.Display.setText("0")
+        else:
+            self.Display.setText(self.Equation)
     
 
 def main():
