@@ -24,33 +24,48 @@ class Calculator(QMainWindow):
 class UserArea(QWidget):
     def __init__(self):
         super(UserArea, self).__init__()
-        self.Display = QLineEdit()
-        self.Display.setAlignment(Qt.AlignRight)
-        self.KNumbers = QGridLayout() # Klawiatura
+        self.KNumbersPattern = [['7','8','9'],
+                                ['4','5','6'],
+                                ['1','2','3'],
+                                ['+/-','0',',']]
+        self.KNumbersButtons = [[QPushButton() for y in self.KNumbersPattern[0]] for x in self.KNumbersPattern]
+        # Matrix = [[0 for x in range(w)] for y in range(h)] 
+        self.KSignsPattern = [[':','<x]'],
+                              ['*','C'],
+                              ['-','^2'],
+                              ['+','=']]
+        self.KSignsButtons = [[QPushButton() for y in self.KSignsPattern[0]] for x in self.KSignsPattern]
+        self.initDisplay() # Add Display
+        self.initKNumbers() # Add numeric keyboard
+        self.initKSigns() # Add special keyboard
+        
         self.Equation = "0"
         self.initUI()
+    def initDisplay(self):
+        self.Display = QLineEdit()
+        self.Display.setAlignment(Qt.AlignRight)
 
+    def initKNumbers(self):
+        self.KNumbers = QGridLayout() # Klawiatura
+        for rownum, row in enumerate(self.KNumbersPattern):
+            for columnnum, sign in enumerate(row):
+                self.KNumbersButtons[rownum][columnnum] = QPushButton(sign)
+                self.KNumbersButtons[rownum][columnnum].clicked.connect(self.sieben) # TODO Sieben na normalną funkcję
+                self.KNumbers.addWidget(self.KNumbersButtons[rownum][columnnum], rownum, columnnum)
+
+    def initKSigns(self):
+        self.KSigns = QGridLayout() # Klawiatura
+        for rownum, row in enumerate(self.KSignsPattern):
+            for columnnum, sign in enumerate(row):
+                self.KSignsButtons[rownum][columnnum] = QPushButton(sign)
+                self.KSignsButtons[rownum][columnnum].clicked.connect(self.sieben) # TODO Sieben na inną funkcję
+                self.KSigns.addWidget(self.KSignsButtons[rownum][columnnum], rownum, columnnum)
 
     def initUI(self):
         vb = QVBoxLayout()
         self.setLayout(vb)
         vb.addWidget(QLCDNumber(0, self))
         
-
-        number7 = QPushButton("7") 
-        number7.clicked.connect(self.sieben)
-        self.KNumbers.addWidget(number7  , 0, 0)
-        self.KNumbers.addWidget(QPushButton("8")  , 0, 1)
-        self.KNumbers.addWidget(QPushButton("9")  , 0, 2)
-        self.KNumbers.addWidget(QPushButton("4")  , 1, 0)
-        self.KNumbers.addWidget(QPushButton("5")  , 1, 1)
-        self.KNumbers.addWidget(QPushButton("6")  , 1, 2)
-        self.KNumbers.addWidget(QPushButton("1")  , 2, 0)
-        self.KNumbers.addWidget(QPushButton("2")  , 2, 1)
-        self.KNumbers.addWidget(QPushButton("3")  , 2, 2)
-        self.KNumbers.addWidget(QPushButton("+/-"), 3, 0)
-        self.KNumbers.addWidget(QPushButton("0")  , 3, 1)
-        self.KNumbers.addWidget(QPushButton(",")  , 3, 2)
         
         KSigns = QGridLayout() # Klawiatura - symbole
         KSigns.addWidget(QPushButton(":")  , 0, 0)
