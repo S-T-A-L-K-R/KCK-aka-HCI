@@ -25,7 +25,8 @@ class Calculator(QMainWindow):
 class UserArea(QWidget):
     def __init__(self):
         super(UserArea, self).__init__()
-        self.Equation = "\0"
+        self.Equation = "0"
+        self.Memory = "0"
         self.Sign = "\0"
         self.KNumbersPattern = [['7','8','9'],
                                 ['4','5','6'],
@@ -45,12 +46,15 @@ class UserArea(QWidget):
         
         self.initUI()
     def initDisplay(self):
-        self.Display = QLineEdit()
-        self.Display.setAlignment(Qt.AlignRight)
-         # self.Display.setFixedHeight(35)
-        # Display.setAlignment(Qt.AlignRight)
-        self.Display.setReadOnly(True)
-        self.EquationDisplay()
+        self.DisplayEquation = QLineEdit()
+        self.DisplayEquation.setAlignment(Qt.AlignRight)
+        # self.Display.setFixedHeight(35)
+        self.DisplayEquation.setReadOnly(True)
+
+        self.DisplayMemory = QLineEdit()
+        self.DisplayMemory.setAlignment(Qt.AlignRight)
+        # self.Display.setFixedHeight(35)
+        self.DisplayMemory.setReadOnly(True)
 
     def initKNumbers(self):
         self.KNumbers = QGridLayout() # Klawiatura
@@ -66,7 +70,7 @@ class UserArea(QWidget):
         for rownum, row in enumerate(self.KSignsPattern):
             for columnnum, sign in enumerate(row):
                 self.KSignsButtons[rownum][columnnum] = QPushButton(sign)
-                self.KSignsButtons[rownum][columnnum].clicked.connect(self.ClickSigns) # TODO ClickNumbers na inną funkcję
+                self.KSignsButtons[rownum][columnnum].clicked.connect(partial(self.ClickSigns, sign))
                 self.KSigns.addWidget(self.KSignsButtons[rownum][columnnum], rownum, columnnum)
 
     def initUI(self):
@@ -75,9 +79,10 @@ class UserArea(QWidget):
         vb.addWidget(QLCDNumber(0, self))
 
         DisplayBox = QGridLayout()
-        
-        DisplayBox.addWidget(self.Display)
 
+        DisplayBox.addWidget(self.DisplayMemory)
+        DisplayBox.addWidget(self.DisplayEquation)
+        
         hb = QHBoxLayout()
         vb.addStretch(1)
         vb.addLayout(DisplayBox)
@@ -93,7 +98,11 @@ class UserArea(QWidget):
     def ClickNumbers(self, sign):
         print(sign)
         if sign not in {'+/-', ','}:
-            self.Equation = self.Equation + sign
+            if self.Equation[0] == '0':
+                if len(self.Equation) == 1 or (len(self.Equation) == 2 and self.Equation[0] == '-'):
+                    self.Equation = self.Equation[:-1] + sign
+            else:
+                self.Equation = self.Equation + sign
         elif sign == ',':
             if ',' not in self.Equation:
                 self.Equation = self.Equation + sign
@@ -105,12 +114,12 @@ class UserArea(QWidget):
         self.EquationDisplay()
 
     def ClickSigns(self, sign):
-        return 0
+        if sign == '<x]':
+            
+            self.Equation = self.Equation[:-1]
+            self.EquationDisplay()
     def EquationDisplay(self):
-        if self.Equation == "\0":
-            self.Display.setText("0")
-        else:
-            self.Display.setText(self.Equation)
+        self.DisplayEquation.setText(self.Equation)
     
 
 def main():
