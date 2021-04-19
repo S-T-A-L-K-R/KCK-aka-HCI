@@ -12,10 +12,6 @@ class Calculator(QMainWindow):
 
     def initUI(self):               
         self.setCentralWidget(UserArea())
-        # menubar = self.menuBar()
-        # editMenu = menubar.addMenu('&Edycja')
-        # viewMenu = menubar.addMenu('&Widok')
-        # helpMenu = menubar.addMenu('Pomo&c')
         
         self.setGeometry(300, 300, 640, 500)
         self.setWindowTitle('Main window')    
@@ -26,6 +22,7 @@ class UserArea(QWidget):
     def __init__(self):
         super(UserArea, self).__init__()
         self.Equation = "0"
+        self.IsNegative = False
         self.Memory = "0"
         self.Sign = "\0"
         self.KNumbersPattern = [['7','8','9'],
@@ -55,6 +52,7 @@ class UserArea(QWidget):
         self.DisplayMemory.setAlignment(Qt.AlignRight)
         # self.Display.setFixedHeight(35)
         self.DisplayMemory.setReadOnly(True)
+        self.DisplayEquation.setText(self.Equation)
 
     def initKNumbers(self):
         self.KNumbers = QGridLayout() # Klawiatura
@@ -99,28 +97,44 @@ class UserArea(QWidget):
         print(sign)
         if sign not in {'+/-', ','}:
             if self.Equation[0] == '0':
-                if len(self.Equation) == 1 or (len(self.Equation) == 2 and self.Equation[0] == '-'):
-                    self.Equation = self.Equation[:-1] + sign
+                if len(self.Equation) > 1:
+                    self.Equation = self.Equation + sign
+                else:
+                    self.Equation = sign
             else:
                 self.Equation = self.Equation + sign
         elif sign == ',':
             if ',' not in self.Equation:
                 self.Equation = self.Equation + sign
         else:
-            if '-' not in self.Equation:
-                self.Equation = '-' + self.Equation
-            else:
-                self.Equation = self.Equation[1:]
+            self.IsNegative = not self.IsNegative
         self.EquationDisplay()
 
     def ClickSigns(self, sign):
         if sign == '<x]':
-            
-            self.Equation = self.Equation[:-1]
-            self.EquationDisplay()
+            if len(self.Equation) > 1:
+                self.Equation = self.Equation[:-1]
+            else:
+                if self.Equation != '0':
+                    self.Equation = '0'
+        elif sign == 'C':
+            self.Equation = '0'
+            self.IsNegative = False
+        elif sign == '^2':
+            print("todo")
+        elif sign == '=':
+            print("todo")
+        else: # + - * :
+            self.Memory = self.Equation
+            self.Operation = sign
+            self.MemoryDisplay = self.Equation + ' ' + sign
+
+        self.EquationDisplay()
     def EquationDisplay(self):
-        self.DisplayEquation.setText(self.Equation)
-    
+        if self.IsNegative:
+            self.DisplayEquation.setText('-' + self.Equation)
+        else:
+            self.DisplayEquation.setText(self.Equation)
 
 def main():
     app = QApplication(sys.argv)
