@@ -21,14 +21,15 @@ class Calculator(QMainWindow):
 class UserArea(QWidget):
     def __init__(self):
         super(UserArea, self).__init__()
-        self.Equation = "0"
+        self.Equation_1 = "0"
+        self.Equation_2 = ""
+        self.Operation = ""
         self.IsNegative = False
-        self.Memory = "0"
-        self.Sign = "\0"
+        
         self.KNumbersPattern = [['7','8','9'],
                                 ['4','5','6'],
                                 ['1','2','3'],
-                                ['+/-','0',',']]
+                                ['+/-','0','.']]
         self.KNumbersButtons = [[QPushButton() for y in self.KNumbersPattern[0]] for x in self.KNumbersPattern]
         # Matrix = [[0 for x in range(w)] for y in range(h)] 
         self.KSignsPattern = [[':','<x]'],
@@ -43,16 +44,16 @@ class UserArea(QWidget):
         
         self.initUI()
     def initDisplay(self):
-        self.DisplayEquation = QLineEdit()
-        self.DisplayEquation.setAlignment(Qt.AlignRight)
+        self.Display_1 = QLineEdit()
+        self.Display_1.setAlignment(Qt.AlignRight)
         # self.Display.setFixedHeight(35)
-        self.DisplayEquation.setReadOnly(True)
+        self.Display_1.setReadOnly(True)
 
-        self.DisplayMemory = QLineEdit()
-        self.DisplayMemory.setAlignment(Qt.AlignRight)
+        self.Display_2 = QLineEdit()
+        self.Display_2.setAlignment(Qt.AlignRight)
         # self.Display.setFixedHeight(35)
-        self.DisplayMemory.setReadOnly(True)
-        self.DisplayEquation.setText(self.Equation)
+        self.Display_1.setReadOnly(True)
+        self.Display_1.setText(self.Equation_1)
 
     def initKNumbers(self):
         self.KNumbers = QGridLayout() # Klawiatura
@@ -78,8 +79,8 @@ class UserArea(QWidget):
 
         DisplayBox = QGridLayout()
 
-        DisplayBox.addWidget(self.DisplayMemory)
-        DisplayBox.addWidget(self.DisplayEquation)
+        DisplayBox.addWidget(self.Display_2)
+        DisplayBox.addWidget(self.Display_1)
         
         hb = QHBoxLayout()
         vb.addStretch(1)
@@ -91,50 +92,68 @@ class UserArea(QWidget):
         vb.addStretch(1)
         vb.addLayout(hb)
         
-    def click(self):
-        print(self.sender().text())
     def ClickNumbers(self, sign):
         print(sign)
-        if sign not in {'+/-', ','}:
-            if self.Equation[0] == '0':
-                if len(self.Equation) > 1:
-                    self.Equation = self.Equation + sign
+        if sign not in {'+/-', '.'}:
+            if self.Equation_1[0] == '0':
+                if len(self.Equation_1) > 1:
+                    self.Equation_1 = self.Equation_1 + sign
                 else:
-                    self.Equation = sign
+                    self.Equation_1 = sign
             else:
-                self.Equation = self.Equation + sign
-        elif sign == ',':
-            if ',' not in self.Equation:
-                self.Equation = self.Equation + sign
+                self.Equation_1 = self.Equation_1 + sign
+        elif sign == '.':
+            if '.' not in self.Equation_1:
+                self.Equation_1 = self.Equation_1 + sign
         else:
             self.IsNegative = not self.IsNegative
         self.EquationDisplay()
 
     def ClickSigns(self, sign):
         if sign == '<x]':
-            if len(self.Equation) > 1:
-                self.Equation = self.Equation[:-1]
+            if len(self.Equation_1) > 1:
+                self.Equation_1 = self.Equation_1[:-1]
             else:
-                if self.Equation != '0':
-                    self.Equation = '0'
+                if self.Equation_1 != '0':
+                    self.Equation_1 = '0'
         elif sign == 'C':
-            self.Equation = '0'
+            self.Equation_1 = '0'
+            self.Equation_2 = ''
+            self.Operation = ''
             self.IsNegative = False
         elif sign == '^2':
             print("todo")
         elif sign == '=':
-            print("todo")
+            self.EquationFinish()
         else: # + - * :
-            self.Memory = self.Equation
+            self.Equation_2 = self.Equation_1
+            if self.IsNegative:
+                self.Equation_2 = '-' + self.Equation_2
+                self.IsNegative = False
             self.Operation = sign
-            self.MemoryDisplay = self.Equation + ' ' + sign
-
+            self.Equation_1 = '0'
+            self.MemoryDisplay()
         self.EquationDisplay()
+        self.MemoryDisplay()
     def EquationDisplay(self):
         if self.IsNegative:
-            self.DisplayEquation.setText('-' + self.Equation)
+            self.Display_1.setText('-' + self.Equation_1)
         else:
-            self.DisplayEquation.setText(self.Equation)
+            self.Display_1.setText(self.Equation_1)
+    def MemoryDisplay(self):
+        self.Display_2.setText(self.Equation_2 + ' ' + self.Operation)
+    def EquationFinish(self):
+        if self.Operation == '+':
+            result = float(self.Equation_2) + float(self.Equation_1)
+        elif self.Operation == '-':
+            result = float(self.Equation_2) - float(self.Equation_1)
+        elif self.Operation == '*':
+            result = float(self.Equation_2) * float(self.Equation_1)
+        elif self.Operation == ':':
+            result = float(self.Equation_2) / float(self.Equation_1)
+        self.Equation_1 = str(result)
+        self.Equation_2 = ''
+        self.Operation = ''
 
 def main():
     app = QApplication(sys.argv)
