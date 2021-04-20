@@ -44,16 +44,19 @@ class UserArea(QWidget):
         
         self.initUI()
     def initDisplay(self):
+        self.Display_2 = QLineEdit()
+        self.Display_2.setAlignment(Qt.AlignRight)
+        # self.Display.setFixedHeight(35)
+        self.Display_2.setReadOnly(True)
+        
+        
         self.Display_1 = QLineEdit()
         self.Display_1.setAlignment(Qt.AlignRight)
         # self.Display.setFixedHeight(35)
         self.Display_1.setReadOnly(True)
-
-        self.Display_2 = QLineEdit()
-        self.Display_2.setAlignment(Qt.AlignRight)
-        # self.Display.setFixedHeight(35)
-        self.Display_1.setReadOnly(True)
         self.Display_1.setText(self.Equation_1)
+
+        
 
     def initKNumbers(self):
         self.KNumbers = QGridLayout() # Klawiatura
@@ -75,7 +78,7 @@ class UserArea(QWidget):
     def initUI(self):
         vb = QVBoxLayout()
         self.setLayout(vb)
-        vb.addWidget(QLCDNumber(0, self))
+        # vb.addWidget(QLCDNumber(0, self)) # TODO wykorzystać to
 
         DisplayBox = QGridLayout()
 
@@ -143,6 +146,7 @@ class UserArea(QWidget):
     def MemoryDisplay(self):
         self.Display_2.setText(self.Equation_2 + ' ' + self.Operation)
     def EquationFinish(self):
+        # TODO eval()
         if self.Operation == '+':
             result = float(self.Equation_2) + float(self.Equation_1)
         elif self.Operation == '-':
