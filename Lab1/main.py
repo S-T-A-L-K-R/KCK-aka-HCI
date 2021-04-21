@@ -36,7 +36,7 @@ class UserArea(QWidget):
                                 ['+/-','0','.']]
         self.KNumbersButtons = [[QPushButton() for y in self.KNumbersPattern[0]] for x in self.KNumbersPattern]
         # Matrix = [[0 for x in range(w)] for y in range(h)] 
-        self.KSignsPattern = [[':','<x]'],
+        self.KSignsPattern = [['/','<x]'],
                               ['*','C'],
                               ['-','^2'],
                               ['+','=']]
@@ -194,7 +194,6 @@ class UserArea(QWidget):
     def initUI(self):
         vb = QVBoxLayout()
         self.setLayout(vb)
-        # vb.addWidget(QLCDNumber(0, self)) # TODO wykorzystać to
 
         DisplayBox = QGridLayout()
 
@@ -282,15 +281,10 @@ class UserArea(QWidget):
     def MemoryDisplay(self):
         self.Display_2.setText(self.Equation_2 + ' ' + self.Operation)
     def EquationFinish(self):
-        # TODO eval()
-        if self.Operation == '+':
-            result = float(self.Equation_2) + float(self.Equation_1)
-        elif self.Operation == '-':
-            result = float(self.Equation_2) - float(self.Equation_1)
-        elif self.Operation == '*':
-            result = float(self.Equation_2) * float(self.Equation_1)
-        elif self.Operation == ':':
-            result = float(self.Equation_2) / float(self.Equation_1)
+        if self.IsNegative:
+            self.Equation_1 = '-' + self.Equation_1
+            self.IsNegative = False
+        result = eval(self.Equation_2 + self.Operation + self.Equation_1)
         self.Equation_1 = str(result)
         self.Equation_2 = ''
         self.Operation = ''
