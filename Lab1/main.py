@@ -131,7 +131,7 @@ class UserArea(QWidget):
                 # self.KNumbersButtons[rownum][columnnum].clicked.connect(partial(self.ClickNumbers, sign))
                 self.KP_2.addWidget(self.KPButtons_2[rownum][columnnum], rownum, columnnum)
                 self.KPButtons_2[rownum][columnnum].setStyleSheet("""
-                    color: magenta;
+                    color: gray;
                 """)
 
 
