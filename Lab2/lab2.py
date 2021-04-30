@@ -21,10 +21,8 @@ class Lab2(QMainWindow):
         else:
             self.colorWindow.hide()
     def colorChange(self, text):
-        self.frame.setStyleSheet("""
-                           background-color:%s }"""
-                               % text())
-        print(text)
+        self.frame.setStyleSheet("background:%s }" % str(text))
+        
     def closeEvent(self, event):
         self.colorWindow.done(0)
         event.accept()
@@ -40,7 +38,7 @@ class Lab2(QMainWindow):
         dialogsMenu = menubar.addMenu('&Dialogi') # Dodanie do menu listy "Dialogi"
 
         self.colorWindow = Kolor() # Tworzenie okna "Kolory"
-        self.colorWindow.accepted.connect(self.colorChange)
+        self.colorWindow.newColorSignal.connect(self.colorChange)
 
         self.colorsAction = QAction('Kolory', self, checkable = True) # Stworzenie akcji "Kolory"
         self.colorsAction.triggered.connect(self.launchColors) # Podpięcie "Kolorów" pod przycisk
