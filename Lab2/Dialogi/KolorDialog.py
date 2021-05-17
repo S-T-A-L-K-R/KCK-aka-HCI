@@ -22,6 +22,8 @@ class Kolor(QDialog):
 
     def closeEvent(self, event):
         event.ignore()
+    def reject(self):
+        print("Chciałbyś...")
     def sendColor(self, text):
         self.newColorSignal.emit(self.pattern[text])
 

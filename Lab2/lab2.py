@@ -3,10 +3,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 
-from Dialogi.IkonaDialog import *
-from Dialogi.KolaDialog import *
-from Dialogi.KolorDialog import *
-from Dialogi.KolaWidget import *
+from Lab2.Dialogi.IkonaDialog import *
+from Lab2.Dialogi.KolaDialog import *
+from Lab2.Dialogi.KolorDialog import *
 
 class Lab2(QMainWindow):
     circleSize1 = 50
