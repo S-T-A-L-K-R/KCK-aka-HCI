@@ -4,14 +4,16 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 from Widgets.circle import *
-# VBox
-# suwak
-# widget z kołem
-# pasek menu
-    # łączenie z serwerem
+
+import socket, pickle
+
+HOST = '127.0.0.1'  # The server's hostname or IP address
+PORT = 6666        # The port used by the server
 
 class Lab3Client(QMainWindow):
     circleSize = 50
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connected = 0
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -20,13 +22,27 @@ class Lab3Client(QMainWindow):
         self.circleSize1 = circle1
         self.update()
 
+    def run(self):
+        print("Socket launching...")
+        self.sock.connect((HOST, PORT))
+        print("Socket connected")
+        self.connected = 1
+
+    def send(self, value):
+        data = pickle.dumps(value)
+        self.sock.sendall(data)
+        print("Data sent: %d", value)
+    
     def initUI(self): 
         # Menu
         self.menubar = self.menuBar() # Inicjalizowanie menu
         self.dialogsMenu = self.menubar.addMenu('&Połączenie') # Dodanie do menu listy "Połączenie"
-        self.connectAction = QAction("Połącz z serwerem", self) # Stworzenie akcji "Połącz z serwerem" # TODO nie hardcodowa nazwa
+        self.connectAction = QAction("Połącz z serwerem", self) # Stworzenie akcji "Połącz z serwerem"
+        self.connectAction.triggered.connect(self.connectServer)
+        # TODO connect server - wątek chwilowy odpalający łączność
+        # TODO potem SEND - też chwilowy wątek
         self.dialogsMenu.addAction(self.connectAction) # Dodanie do listy "Połączenie" akcji "Połącz z serwerem"
-        
+        # TODO wątki DAEMON
         # Suwak
         self.bar = QSlider(Qt.Horizontal)
         self.bar.setMaximum(255)
@@ -56,6 +72,9 @@ class Lab3Client(QMainWindow):
         self.show()
     def bar_change(self, value):
         self.circleSize = value
+        if self.connected == 1:
+            self.connection.send(value)
+
 def main():
     app = QApplication(sys.argv)
     ex = Lab3Client()
